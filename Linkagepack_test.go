@@ -116,6 +116,12 @@ func TestColumnMerge11(t *testing.T) {
 	}
 }
 
+var test_tree = map[TreeNode]Leaf{
+	TreeNode{0, 0, 0, 0}:       Leaf{0, 0},
+	TreeNode{0, 5.01, 3, 5.01}: Leaf{0, 1.02},
+	TreeNode{0, 6.03, 1, 6.03}: Leaf{0, 0.52},
+	TreeNode{2, 4.66, 4, 4.66}: Leaf{2, 1.89}}
+
 func TestColumnMerge2(t *testing.T) {
 	//old_index := make([]int, 1)
 	old_index := []int{0, 1, 2, 3}
