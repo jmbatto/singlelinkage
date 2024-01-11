@@ -5,7 +5,7 @@ import (
 	"math"
 )
 
-//return a reduced matrix -without last column
+// return a reduced matrix -without last column
 func RemoveLineColMatrix(matrix [][]float64) [][]float64 {
 	newMatrix := make([][]float64, len(matrix))
 	// Parcourir chaque ligne de la matrice originale
@@ -24,7 +24,7 @@ func RemoveLineColMatrix(matrix [][]float64) [][]float64 {
 	return newMatrix
 }
 
-//in place reduced matrix -without last column
+// in place reduced matrix -without last column
 func removeLineColMatrix(matrix [][]float64) [][]float64 {
 	columnIndex := len(matrix) - 1
 	for i := 0; i < len(matrix); i++ {
@@ -38,7 +38,7 @@ func removeLineColMatrix(matrix [][]float64) [][]float64 {
 	return matrix
 }
 
-//merge 2 column in place column max
+// merge 2 column in place column max
 func columnMerge(matrix [][]float64, min_col, max_col int) [][]float64 {
 	for i := 0; i < max_col; i++ {
 		if i != min_col && i != max_col {
@@ -49,7 +49,7 @@ func columnMerge(matrix [][]float64, min_col, max_col int) [][]float64 {
 	return removeLineColMatrix(matrix)
 }
 
-//return col A, col B, minDist, minDist-minDist1
+// return col A, col B, minDist, minDist-minDist1
 func minMatrix(matrix [][]float64, size int) (int, int, float64, float64) {
 	min := 1000.0  //math.MaxFloat64  //matrix[0][1]
 	min1 := 1000.0 //math.MaxFloat64 //matrix[0][2]
