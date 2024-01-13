@@ -2,6 +2,7 @@
 package Linkagepack
 
 import (
+	"math"
 	"testing"
 )
 
@@ -78,6 +79,7 @@ func TestRemoveCol(t *testing.T) {
 // }
 
 type TreeNode struct {
+	Order int
 	Rank1   int
 	Length1 float64
 	Rank2   int
@@ -117,10 +119,31 @@ func TestColumnMerge11(t *testing.T) {
 }
 
 var test_tree = map[TreeNode]Leaf{
-	TreeNode{0, 0, 0, 0}:       Leaf{0, 0},
+	TreeNode{0, 0, 0, 0}:       Leaf{0, 1000.0},
 	TreeNode{0, 5.01, 3, 5.01}: Leaf{0, 1.02},
 	TreeNode{0, 6.03, 1, 6.03}: Leaf{0, 0.52},
 	TreeNode{2, 4.66, 4, 4.66}: Leaf{2, 1.89}}
+
+//fin
+func findNextLeaf(tree Tree, leaf Leaf) {
+
+}
+
+func TestColumnMerge22(t *testing.T) {
+	i_mini_old := 1000.0
+	i_mini := i_mini_old
+	i_key_memo := TreeNode{}
+	var i_rank int
+	for i_key, i_val := range test_tree {
+		i_mini = math.Min(i_mini_old, i_val.Length)
+		if i_mini != i_mini_old {
+			i_key_memo = i_key
+			i_rank = i_val.Rank
+		}
+		i_mini_old = i_mini
+	}
+	t.Logf("22: %v %v %v \n", i_rank, i_mini, i_key_memo)
+}
 
 func TestColumnMerge2(t *testing.T) {
 	//old_index := make([]int, 1)
