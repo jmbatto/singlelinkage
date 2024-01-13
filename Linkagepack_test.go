@@ -2,7 +2,9 @@
 package Linkagepack
 
 import (
+	"fmt"
 	"math"
+	"sort"
 	"testing"
 )
 
@@ -79,7 +81,6 @@ func TestRemoveCol(t *testing.T) {
 // }
 
 type TreeNode struct {
-	Order int
 	Rank1   int
 	Length1 float64
 	Rank2   int
@@ -90,6 +91,12 @@ type Leaf struct {
 	Rank   int
 	Length float64
 }
+
+type TreeNodeLeaf struct {
+	TreeNode
+	Leaf
+}
+type TreeRank map[int]TreeNodeLeaf
 type Tree map[TreeNode]Leaf
 
 func TestColumnMerge11(t *testing.T) {
@@ -118,21 +125,45 @@ func TestColumnMerge11(t *testing.T) {
 	}
 }
 
-var test_tree = map[TreeNode]Leaf{
-	TreeNode{0, 0, 0, 0}:       Leaf{0, 1000.0},
-	TreeNode{0, 5.01, 3, 5.01}: Leaf{0, 1.02},
-	TreeNode{0, 6.03, 1, 6.03}: Leaf{0, 0.52},
-	TreeNode{2, 4.66, 4, 4.66}: Leaf{2, 1.89}}
+var test_tree = map[int]TreeNodeLeaf{ //ordered according to insertion, continuous
+	0: TreeNodeLeaf{TreeNode{0, 0, 0, 0}, Leaf{0, 1000.0}},
+	2: TreeNodeLeaf{TreeNode{0, 5.01, 3, 5.01}, Leaf{0, 1.02}},
+	3: TreeNodeLeaf{TreeNode{0, 6.03, 1, 6.03}, Leaf{0, 0.52}},
+	1: TreeNodeLeaf{TreeNode{2, 4.66, 4, 4.66}, Leaf{2, 1.89}},
+}
 
-//fin
-func findNextLeaf(tree Tree, leaf Leaf) {
+//get a slice of sorted TreeNodeLeaf according Leaf Lenght for a Rank of interest
+func sortTreeNodeLeaf(tree map[int]TreeNodeLeaf, index int) []TreeNodeLeaf {
+	keysToSort := make([]TreeNodeLeaf, 0)
+	for _, i_val := range tree {
+		if i_val.Rank == tree[index].Rank {
+			keysToSort = append(keysToSort, i_val)
+		}
+	}
+	sort.Slice(keysToSort, func(i, j int) bool { return keysToSort[i].Length < keysToSort[j].Length })
+	return keysToSort
+}
 
+func findNextLeaf(tree map[int]TreeNodeLeaf, index int) (L Leaf, I int) {
+	leaf := tree[index].Leaf
+	fmt.Printf("leaf %v \n", leaf)
+	sortedTree := sortTreeNodeLeaf(tree, index)
+	for _, i_val := range sortedTree {
+		// 	fmt.Printf("i_val %v %v %v \n", i_val, i_key, index)
+		if i_val.Length > leaf.Length { // find next
+			L = i_val.Leaf
+			I = index
+			fmt.Printf("return i_val %v \n", i_val)
+			return L, I
+		}
+	}
+	return
 }
 
 func TestColumnMerge22(t *testing.T) {
 	i_mini_old := 1000.0
 	i_mini := i_mini_old
-	i_key_memo := TreeNode{}
+	var i_key_memo int
 	var i_rank int
 	for i_key, i_val := range test_tree {
 		i_mini = math.Min(i_mini_old, i_val.Length)
@@ -143,6 +174,8 @@ func TestColumnMerge22(t *testing.T) {
 		i_mini_old = i_mini
 	}
 	t.Logf("22: %v %v %v \n", i_rank, i_mini, i_key_memo)
+	L, I := findNextLeaf(test_tree, i_key_memo)
+	t.Logf("22: %v %v \n", L, I)
 }
 
 func TestColumnMerge2(t *testing.T) {
