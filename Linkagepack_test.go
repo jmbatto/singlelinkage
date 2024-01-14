@@ -133,6 +133,7 @@ var test_tree = map[int]TreeNodeLeaf{ //ordered according to insertion, continuo
 }
 
 //get a slice of sorted TreeNodeLeaf according Leaf Lenght for a Rank of interest
+//could be improved with a buffer (to avoid recomputing the sorted TreeNodeLeaf
 func sortTreeNodeLeaf(tree map[int]TreeNodeLeaf, index int) []TreeNodeLeaf {
 	keysToSort := make([]TreeNodeLeaf, 0)
 	for _, i_val := range tree {
@@ -144,15 +145,26 @@ func sortTreeNodeLeaf(tree map[int]TreeNodeLeaf, index int) []TreeNodeLeaf {
 	return keysToSort
 }
 
+func findIndexTreeNode(tree map[int]TreeNodeLeaf, T TreeNode, L Leaf) int {
+	for i_index, _ := range tree {
+		if tree[i_index].Leaf == L && tree[i_index].TreeNode == T {
+			return i_index
+		}
+	}
+	return 0
+}
+
 func findNextLeaf(tree map[int]TreeNodeLeaf, index int) (L Leaf, I int) {
 	leaf := tree[index].Leaf
 	fmt.Printf("leaf %v \n", leaf)
 	sortedTree := sortTreeNodeLeaf(tree, index)
-	for _, i_val := range sortedTree {
+	for i_index, i_val := range sortedTree {
 		// 	fmt.Printf("i_val %v %v %v \n", i_val, i_key, index)
 		if i_val.Length > leaf.Length { // find next
 			L = i_val.Leaf
-			I = index
+			//find in TreeNodeLeaf index of L
+			T := sortedTree[i_index].TreeNode
+			I := findIndexTreeNode(tree, T, L)
 			fmt.Printf("return i_val %v \n", i_val)
 			return L, I
 		}
