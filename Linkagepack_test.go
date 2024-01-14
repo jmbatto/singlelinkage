@@ -126,7 +126,7 @@ func TestColumnMerge11(t *testing.T) {
 }
 
 var test_tree = map[int]TreeNodeLeaf{ //ordered according to insertion, continuous
-	0: TreeNodeLeaf{TreeNode{0, 0, 0, 0}, Leaf{0, 1000.0}},
+	//0: TreeNodeLeaf{TreeNode{0, 0, 0, 0}, Leaf{0, 1000.0}},
 	2: TreeNodeLeaf{TreeNode{0, 5.01, 3, 5.01}, Leaf{0, 1.02}},
 	3: TreeNodeLeaf{TreeNode{0, 6.03, 1, 6.03}, Leaf{0, 0.52}},
 	1: TreeNodeLeaf{TreeNode{2, 4.66, 4, 4.66}, Leaf{2, 1.89}},
@@ -145,31 +145,44 @@ func sortTreeNodeLeaf(tree map[int]TreeNodeLeaf, index int) []TreeNodeLeaf {
 	return keysToSort
 }
 
-func findIndexTreeNode(tree map[int]TreeNodeLeaf, T TreeNode, L Leaf) int {
+func findIndexTreeNode(tree map[int]TreeNodeLeaf, T TreeNode, L Leaf) (int, bool) {
 	for i_index, _ := range tree {
 		if tree[i_index].Leaf == L && tree[i_index].TreeNode == T {
-			return i_index
+			return i_index, true
 		}
 	}
-	return 0
+	return 0, false
 }
 
-func findNextLeaf(tree map[int]TreeNodeLeaf, index int) (L Leaf, I int) {
+func findNextLeaf(tree map[int]TreeNodeLeaf, index int) (T TreeNode, L Leaf, I int, found bool) {
 	leaf := tree[index].Leaf
-	fmt.Printf("leaf %v \n", leaf)
 	sortedTree := sortTreeNodeLeaf(tree, index)
 	for i_index, i_val := range sortedTree {
-		// 	fmt.Printf("i_val %v %v %v \n", i_val, i_key, index)
 		if i_val.Length > leaf.Length { // find next
 			L = i_val.Leaf
 			//find in TreeNodeLeaf index of L
-			T := sortedTree[i_index].TreeNode
-			I := findIndexTreeNode(tree, T, L)
-			fmt.Printf("return i_val %v \n", i_val)
-			return L, I
+			T = sortedTree[i_index].TreeNode
+			I, found := findIndexTreeNode(tree, T, L)
+			return T, L, I, found
 		}
 	}
 	return
+}
+
+func findNextLeafRecursive(tree map[int]TreeNodeLeaf, index int) (textleaf string) {
+	T, L, I, ok := findNextLeaf(tree, index)
+	if ok == false {
+		return
+	}
+	//recursive ?
+	textleaf = fmt.Sprintf("(%d:%f,%d:%f)", T.Rank1, T.Length1, T.Rank2, T.Length2)
+	return textleaf + findNextLeafRecursive(tree, I) + fmt.Sprintf(":%f", L.Length)
+}
+
+//recursive call to use a stack mechanism
+func getLeafRecursive(tree map[int]TreeNodeLeaf, index int) (textleaf string) {
+	textleaf = findNextLeafRecursive(tree, index)
+	return textleaf
 }
 
 func TestColumnMerge22(t *testing.T) {
@@ -177,17 +190,28 @@ func TestColumnMerge22(t *testing.T) {
 	i_mini := i_mini_old
 	var i_key_memo int
 	var i_rank int
+	var T TreeNode
+	var L Leaf
+	var I int
+	var ok bool
 	for i_key, i_val := range test_tree {
 		i_mini = math.Min(i_mini_old, i_val.Length)
 		if i_mini != i_mini_old {
 			i_key_memo = i_key
 			i_rank = i_val.Rank
+			T = i_val.TreeNode
 		}
 		i_mini_old = i_mini
 	}
-	t.Logf("22: %v %v %v \n", i_rank, i_mini, i_key_memo)
-	L, I := findNextLeaf(test_tree, i_key_memo)
-	t.Logf("22: %v %v \n", L, I)
+	t.Logf("22: %v %v %v %v \n", T, i_rank, i_mini, i_key_memo)
+	T, L, I, ok = findNextLeaf(test_tree, i_key_memo)
+	t.Logf("22 1: %v %v %v %v \n", T, L, I, ok)
+	T, L, I, ok = findNextLeaf(test_tree, I)
+	t.Logf("22 2: %v %v %v %v \n", T, L, I, ok)
+	T, L, I, ok = findNextLeaf(test_tree, I)
+	t.Logf("22 3: %v %v %v %v \n", T, L, I, ok)
+	textfeaf := getLeafRecursive(test_tree, i_key_memo)
+	t.Logf("22: %v \n", textfeaf)
 }
 
 func TestColumnMerge2(t *testing.T) {
