@@ -185,6 +185,24 @@ func getLeafRecursive(tree map[int]TreeNodeLeaf, index int) (textleaf string) {
 	return textleaf
 }
 
+//collect all the root Leaf (from where a subtree can be build)
+func enumerateLeafRoot(tree map[int]TreeNodeLeaf) (retLeaf []Leaf) {
+	tmp := map[int]Leaf{} //int = the Leaf Rank - to be changed
+	for _, i_val := range tree {
+		if _, ok := tmp[i_val.Rank]; ok {
+			if tmp[i_val.Rank].Length > i_val.Length {
+				tmp[i_val.Rank] = i_val.Leaf
+			}
+		} else {
+			tmp[i_val.Rank] = i_val.Leaf
+		}
+	}
+	for _, i_val := range tmp {
+		retLeaf = append(retLeaf, i_val)
+	}
+	return
+}
+
 func TestColumnMerge22(t *testing.T) {
 	i_mini_old := 1000.0
 	i_mini := i_mini_old
@@ -212,6 +230,8 @@ func TestColumnMerge22(t *testing.T) {
 	t.Logf("22 3: %v %v %v %v \n", T, L, I, ok)
 	textfeaf := getLeafRecursive(test_tree, i_key_memo)
 	t.Logf("22: %v \n", textfeaf)
+	retLeaf := enumerateLeafRoot(test_tree)
+	t.Logf("22: %v \n", retLeaf)
 }
 
 func TestColumnMerge2(t *testing.T) {
