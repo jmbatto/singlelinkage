@@ -2,9 +2,8 @@
 package Linkagepack
 
 import (
-	"fmt"
 	"math"
-	"sort"
+	"strings"
 	"testing"
 )
 
@@ -80,25 +79,6 @@ func TestRemoveCol(t *testing.T) {
 
 // }
 
-type TreeNode struct {
-	Rank1   int
-	Length1 float64
-	Rank2   int
-	Length2 float64
-}
-
-type Leaf struct {
-	Rank   int
-	Length float64
-}
-
-type TreeNodeLeaf struct {
-	TreeNode
-	Leaf
-}
-type TreeRank map[int]TreeNodeLeaf
-type Tree map[TreeNode]Leaf
-
 func TestColumnMerge11(t *testing.T) {
 	t.Logf("1: %v \n", matrix_start)
 	i_start := len(matrix_start)
@@ -122,7 +102,9 @@ func TestColumnMerge11(t *testing.T) {
 		matrix_start1 := columnMerge(matrix_start_i, i1, i2)
 		matrix_start_i = matrix_start1
 		t.Logf("2: %v %v %v %v\n", matrix_start_i, d, delta, tree)
+
 	}
+
 }
 
 var test_tree = map[int]TreeNodeLeaf{ //ordered according to insertion, continuous
@@ -130,77 +112,6 @@ var test_tree = map[int]TreeNodeLeaf{ //ordered according to insertion, continuo
 	2: TreeNodeLeaf{TreeNode{0, 5.01, 3, 5.01}, Leaf{0, 1.02}},
 	3: TreeNodeLeaf{TreeNode{0, 6.03, 1, 6.03}, Leaf{0, 0.52}},
 	1: TreeNodeLeaf{TreeNode{2, 4.66, 4, 4.66}, Leaf{2, 1.89}},
-}
-
-//get a slice of sorted TreeNodeLeaf according Leaf Lenght for a Rank of interest
-//could be improved with a buffer (to avoid recomputing the sorted TreeNodeLeaf
-func sortTreeNodeLeaf(tree map[int]TreeNodeLeaf, index int) []TreeNodeLeaf {
-	keysToSort := make([]TreeNodeLeaf, 0)
-	for _, i_val := range tree {
-		if i_val.Rank == tree[index].Rank {
-			keysToSort = append(keysToSort, i_val)
-		}
-	}
-	sort.Slice(keysToSort, func(i, j int) bool { return keysToSort[i].Length < keysToSort[j].Length })
-	return keysToSort
-}
-
-func findIndexTreeNode(tree map[int]TreeNodeLeaf, T TreeNode, L Leaf) (int, bool) {
-	for i_index, _ := range tree {
-		if tree[i_index].Leaf == L && tree[i_index].TreeNode == T {
-			return i_index, true
-		}
-	}
-	return 0, false
-}
-
-func findNextLeaf(tree map[int]TreeNodeLeaf, index int) (T TreeNode, L Leaf, I int, found bool) {
-	leaf := tree[index].Leaf
-	sortedTree := sortTreeNodeLeaf(tree, index)
-	for i_index, i_val := range sortedTree {
-		if i_val.Length > leaf.Length { // find next
-			L = i_val.Leaf
-			//find in TreeNodeLeaf index of L
-			T = sortedTree[i_index].TreeNode
-			I, found := findIndexTreeNode(tree, T, L)
-			return T, L, I, found
-		}
-	}
-	return
-}
-
-func findNextLeafRecursive(tree map[int]TreeNodeLeaf, index int) (textleaf string) {
-	T, L, I, ok := findNextLeaf(tree, index)
-	if ok == false {
-		return
-	}
-	//recursive ?
-	textleaf = fmt.Sprintf("(%d:%f,%d:%f)", T.Rank1, T.Length1, T.Rank2, T.Length2)
-	return textleaf + findNextLeafRecursive(tree, I) + fmt.Sprintf(":%f", L.Length)
-}
-
-//recursive call to use a stack mechanism
-func getLeafRecursive(tree map[int]TreeNodeLeaf, index int) (textleaf string) {
-	textleaf = findNextLeafRecursive(tree, index)
-	return textleaf
-}
-
-//collect all the root Leaf (from where a subtree can be build)
-func enumerateLeafRoot(tree map[int]TreeNodeLeaf) (retLeaf []Leaf) {
-	tmp := map[int]Leaf{} //int = the Leaf Rank - to be changed
-	for _, i_val := range tree {
-		if _, ok := tmp[i_val.Rank]; ok {
-			if tmp[i_val.Rank].Length > i_val.Length {
-				tmp[i_val.Rank] = i_val.Leaf
-			}
-		} else {
-			tmp[i_val.Rank] = i_val.Leaf
-		}
-	}
-	for _, i_val := range tmp {
-		retLeaf = append(retLeaf, i_val)
-	}
-	return
 }
 
 func TestColumnMerge22(t *testing.T) {
@@ -228,10 +139,24 @@ func TestColumnMerge22(t *testing.T) {
 	t.Logf("22 2: %v %v %v %v \n", T, L, I, ok)
 	T, L, I, ok = findNextLeaf(test_tree, I)
 	t.Logf("22 3: %v %v %v %v \n", T, L, I, ok)
-	textfeaf := getLeafRecursive(test_tree, i_key_memo)
+	textfeaf, _ := getLeafRecursive(test_tree, i_key_memo)
 	t.Logf("22: %v \n", textfeaf)
 	retLeaf := enumerateLeafRoot(test_tree)
 	t.Logf("22: %v \n", retLeaf)
+	var response string
+	for _, i_var := range retLeaf {
+		response = processCurrentLeaf(test_tree, i_var.Index) + "," + response
+	}
+	t.Logf("23: %v \n", "("+strings.TrimSuffix(response, ",")+");")
+	test_tree2 := buildTree(matrix_start1)
+	t.Logf("24: %v \n", test_tree2)
+	t.Logf("24: %v \n", test_tree)
+	retLeaf2 := enumerateLeafRoot(test_tree2)
+	var response2 string
+	for _, i_var := range retLeaf2 {
+		response2 = processCurrentLeaf(test_tree2, i_var.Index) + "," + response2
+	}
+	t.Logf("24: %v \n", "("+strings.TrimSuffix(response2, ",")+");")
 }
 
 func TestColumnMerge2(t *testing.T) {
