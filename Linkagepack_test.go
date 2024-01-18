@@ -102,9 +102,7 @@ func TestAlgoMatrixLinkage(t *testing.T) {
 		matrix_start1 := columnMerge(matrix_start_i, i1, i2)
 		matrix_start_i = matrix_start1
 		t.Logf("Intermediate matrix result: %v \n %v %v \n computed map %v\n", matrix_start_i, d, delta, tree)
-
 	}
-
 }
 
 var test_tree = map[int]TreeNodeLeaf{ //ordered according to insertion, continuous
@@ -120,9 +118,7 @@ func TestAlgoMatrixLinkageProduceString(t *testing.T) {
 	var i_key_memo int
 	var i_rank int
 	var T TreeNode
-	// var L Leaf
-	// var I int
-	// var ok bool
+
 	for i_key, i_val := range test_tree {
 		i_mini = math.Min(i_mini_old, i_val.Length)
 		if i_mini != i_mini_old {
@@ -133,19 +129,14 @@ func TestAlgoMatrixLinkageProduceString(t *testing.T) {
 		i_mini_old = i_mini
 	}
 	t.Logf("Find root Leaf : %v %v %v %v \n", T, i_rank, i_mini, i_key_memo)
-	// T, L, I, ok = findNextLeaf(test_tree, i_key_memo)
-	// t.Logf("22 1: %v %v %v %v \n", T, L, I, ok)
-	// T, L, I, ok = findNextLeaf(test_tree, I)
-	// t.Logf("22 2: %v %v %v %v \n", T, L, I, ok)
-	// T, L, I, ok = findNextLeaf(test_tree, I)
-	// t.Logf("22 3: %v %v %v %v \n", T, L, I, ok)
-	textfeaf, _ := getLeafRecursive(test_tree, i_key_memo)
+
+	textfeaf, _ := getLeafRecursive(test_tree, i_key_memo, matrix_colName)
 	t.Logf("getLeafRecursive: %v \n", textfeaf)
 	retLeaf := enumerateLeafRoot(test_tree)
 	t.Logf("enumerateLeafRoot: %v \n", retLeaf)
 	var response string
 	for _, i_var := range retLeaf {
-		response = processCurrentLeaf(test_tree, i_var.Index) + "," + response
+		response = processCurrentLeaf(test_tree, i_var.Index, matrix_colName) + "," + response
 	}
 	t.Logf("computed String : %v \n", "("+strings.TrimSuffix(response, ",")+");")
 	test_tree2 := buildTree(matrix_start1)
@@ -155,16 +146,22 @@ func TestAlgoMatrixLinkageProduceString(t *testing.T) {
 	retLeaf2 := enumerateLeafRoot(test_tree2)
 	var response2 string
 	for _, i_var := range retLeaf2 {
-		response2 = processCurrentLeaf(test_tree2, i_var.Index) + "," + response2
+		response2 = processCurrentLeaf(test_tree2, i_var.Index, matrix_colName) + "," + response2
 	}
 	t.Logf("Target result : %v \n", target_result)
 	t.Logf("Linkage Algo String Computed : %v \n", "("+strings.TrimSuffix(response2, ",")+");")
 }
 
-func TestColumnsMerge(t *testing.T) {
-	test_index := []int{0, 1, 2, 3}
-	t.Logf("input matrix_intermediary1 : %v \n", matrix_intermediary1)
-	columnsMerge(matrix_intermediary1, test_index, 0, 3)
-	t.Logf("merged matrix_intermediary1 : %v \n", matrix_intermediary1)
-	//t.Logf("test_index : %v \n", test_index)
+func TestMatrixLinkage(t *testing.T) {
+	var matrix [][]float64 = [][]float64{
+		{0, 7.40, 7.56, 5.01, 12.43},
+		{7.40, 0, 8.62, 6.03, 6.55},
+		{7.56, 8.62, 0, 12.46, 4.66},
+		{5.01, 6.03, 12.46, 0, 9.28},
+		{12.43, 6.55, 4.66, 9.28, 0},
+	}
+	var matrix_colName []string = []string{"A", "B", "C", "D", "E"}
+	computed_result := MatrixLinkage(matrix, matrix_colName)
+	t.Logf("Target result : %v \n", target_result)
+	t.Logf("Computed result : %v \n", computed_result)
 }

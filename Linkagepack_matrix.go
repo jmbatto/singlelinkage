@@ -191,20 +191,20 @@ func findNextLeaf(tree map[int]TreeNodeLeaf, index int) (T TreeNode, L Leaf, I i
 	return
 }
 
-func findNextLeafRecursive(tree map[int]TreeNodeLeaf, index int) (textleaf string, ok bool) {
+func findNextLeafRecursive(tree map[int]TreeNodeLeaf, index int, colname []string) (textleaf string, ok bool) {
 	T, L, I, ok := findNextLeaf(tree, index)
 	if ok == false {
 		return "", ok
 	}
 	//recursive ?
-	textleaf = fmt.Sprintf("(%d:%.2f,%d:%.2f)", T.Rank1, T.Length1, T.Rank2, T.Length2)
-	memo_text, _ := findNextLeafRecursive(tree, I)
+	textleaf = fmt.Sprintf("(%s:%.2f,%s:%.2f)", colname[T.Rank1], T.Length1, colname[T.Rank2], T.Length2)
+	memo_text, _ := findNextLeafRecursive(tree, I, colname)
 	return textleaf + memo_text + fmt.Sprintf(":%.2f", L.Length), ok
 }
 
 //recursive call to use a stack mechanism
-func getLeafRecursive(tree map[int]TreeNodeLeaf, index int) (textleaf string, ok bool) {
-	textleaf, ok = findNextLeafRecursive(tree, index)
+func getLeafRecursive(tree map[int]TreeNodeLeaf, index int, colname []string) (textleaf string, ok bool) {
+	textleaf, ok = findNextLeafRecursive(tree, index, colname)
 	return textleaf, ok
 }
 
@@ -226,17 +226,17 @@ func enumerateLeafRoot(tree map[int]TreeNodeLeaf) (retLeaf []LeafIndex) {
 	return
 }
 
-func processCurrentLeaf(tree map[int]TreeNodeLeaf, index int) (textleaf string) {
+func processCurrentLeaf(tree map[int]TreeNodeLeaf, index int, colname []string) (textleaf string) {
 	T := tree[index]
-	text1, ok := getLeafRecursive(tree, index)
+	text1, ok := getLeafRecursive(tree, index, colname)
 	if ok {
 		if T.Rank == T.Rank1 {
-			textleaf = fmt.Sprintf("(%s,%d:%.2f):%.2f", text1, T.Rank2, T.Length2, T.Length)
+			textleaf = fmt.Sprintf("(%s,%s:%.2f):%.2f", text1, colname[T.Rank2], T.Length2, T.Length)
 		} else if T.Rank == T.Rank2 {
-			textleaf = fmt.Sprintf("(%d:%.2f,%s):%.2f", T.Rank1, T.Length1, text1, T.Length)
+			textleaf = fmt.Sprintf("(%s:%.2f,%s):%.2f", colname[T.Rank1], T.Length1, text1, T.Length)
 		}
 	} else {
-		textleaf = fmt.Sprintf("(%d:%.2f,%d:%.2f):%.2f", T.Rank1, T.Length1, T.Rank2, T.Length2, T.Length)
+		textleaf = fmt.Sprintf("(%s:%.2f,%s:%.2f):%.2f", colname[T.Rank1], T.Length1, colname[T.Rank2], T.Length2, T.Length)
 	}
 	return textleaf
 }
