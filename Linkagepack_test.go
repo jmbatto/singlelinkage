@@ -79,12 +79,12 @@ func TestRemoveCol(t *testing.T) {
 
 // }
 
-func TestColumnMerge11(t *testing.T) {
-	t.Logf("1: %v \n", matrix_start)
+func TestAlgoMatrixLinkage(t *testing.T) {
+	t.Logf("Input Matrix : %v \n", matrix_start)
 	i_start := len(matrix_start)
 	matrix_start_i := matrix_start
 	tree := Tree{
-		TreeNode{0, 0.0, 0, 0.0}: Leaf{},
+		//TreeNode{0, 0.0, 0, 0.0}: Leaf{},
 	}
 
 	for i := i_start; i > 1; i-- {
@@ -101,7 +101,7 @@ func TestColumnMerge11(t *testing.T) {
 		}
 		matrix_start1 := columnMerge(matrix_start_i, i1, i2)
 		matrix_start_i = matrix_start1
-		t.Logf("2: %v %v %v %v\n", matrix_start_i, d, delta, tree)
+		t.Logf("Intermediate matrix result: %v \n %v %v \n computed map %v\n", matrix_start_i, d, delta, tree)
 
 	}
 
@@ -114,15 +114,15 @@ var test_tree = map[int]TreeNodeLeaf{ //ordered according to insertion, continuo
 	1: TreeNodeLeaf{TreeNode{2, 4.66, 4, 4.66}, Leaf{2, 1.89}},
 }
 
-func TestColumnMerge22(t *testing.T) {
-	i_mini_old := 1000.0
+func TestAlgoMatrixLinkageProduceString(t *testing.T) {
+	i_mini_old := minLength
 	i_mini := i_mini_old
 	var i_key_memo int
 	var i_rank int
 	var T TreeNode
-	var L Leaf
-	var I int
-	var ok bool
+	// var L Leaf
+	// var I int
+	// var ok bool
 	for i_key, i_val := range test_tree {
 		i_mini = math.Min(i_mini_old, i_val.Length)
 		if i_mini != i_mini_old {
@@ -132,38 +132,39 @@ func TestColumnMerge22(t *testing.T) {
 		}
 		i_mini_old = i_mini
 	}
-	t.Logf("22: %v %v %v %v \n", T, i_rank, i_mini, i_key_memo)
-	T, L, I, ok = findNextLeaf(test_tree, i_key_memo)
-	t.Logf("22 1: %v %v %v %v \n", T, L, I, ok)
-	T, L, I, ok = findNextLeaf(test_tree, I)
-	t.Logf("22 2: %v %v %v %v \n", T, L, I, ok)
-	T, L, I, ok = findNextLeaf(test_tree, I)
-	t.Logf("22 3: %v %v %v %v \n", T, L, I, ok)
+	t.Logf("Find root Leaf : %v %v %v %v \n", T, i_rank, i_mini, i_key_memo)
+	// T, L, I, ok = findNextLeaf(test_tree, i_key_memo)
+	// t.Logf("22 1: %v %v %v %v \n", T, L, I, ok)
+	// T, L, I, ok = findNextLeaf(test_tree, I)
+	// t.Logf("22 2: %v %v %v %v \n", T, L, I, ok)
+	// T, L, I, ok = findNextLeaf(test_tree, I)
+	// t.Logf("22 3: %v %v %v %v \n", T, L, I, ok)
 	textfeaf, _ := getLeafRecursive(test_tree, i_key_memo)
-	t.Logf("22: %v \n", textfeaf)
+	t.Logf("getLeafRecursive: %v \n", textfeaf)
 	retLeaf := enumerateLeafRoot(test_tree)
-	t.Logf("22: %v \n", retLeaf)
+	t.Logf("enumerateLeafRoot: %v \n", retLeaf)
 	var response string
 	for _, i_var := range retLeaf {
 		response = processCurrentLeaf(test_tree, i_var.Index) + "," + response
 	}
-	t.Logf("23: %v \n", "("+strings.TrimSuffix(response, ",")+");")
+	t.Logf("computed String : %v \n", "("+strings.TrimSuffix(response, ",")+");")
 	test_tree2 := buildTree(matrix_start1)
-	t.Logf("24: %v \n", test_tree2)
-	t.Logf("24: %v \n", test_tree)
+	t.Logf("targetTree with shifted index : %v \n", test_tree)
+	t.Logf("computed buildTree (from index 0) : %v \n", test_tree2)
+	//Linkage Algo
 	retLeaf2 := enumerateLeafRoot(test_tree2)
 	var response2 string
 	for _, i_var := range retLeaf2 {
 		response2 = processCurrentLeaf(test_tree2, i_var.Index) + "," + response2
 	}
-	t.Logf("24: %v \n", "("+strings.TrimSuffix(response2, ",")+");")
+	t.Logf("Target result : %v \n", target_result)
+	t.Logf("Linkage Algo String Computed : %v \n", "("+strings.TrimSuffix(response2, ",")+");")
 }
 
-func TestColumnMerge2(t *testing.T) {
-	//old_index := make([]int, 1)
-	old_index := []int{0, 1, 2, 3}
-	t.Logf("1: %v \n", matrix_intermediary1)
-	columnsMerge(matrix_intermediary1, old_index, 0, 3)
-	t.Logf("2: %v \n", matrix_intermediary1)
-	t.Logf("3: %v \n", old_index)
+func TestColumnsMerge(t *testing.T) {
+	test_index := []int{0, 1, 2, 3}
+	t.Logf("input matrix_intermediary1 : %v \n", matrix_intermediary1)
+	columnsMerge(matrix_intermediary1, test_index, 0, 3)
+	t.Logf("merged matrix_intermediary1 : %v \n", matrix_intermediary1)
+	//t.Logf("test_index : %v \n", test_index)
 }

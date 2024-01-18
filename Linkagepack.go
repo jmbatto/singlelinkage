@@ -6,49 +6,7 @@ import (
 	"io/ioutil"
 )
 
-func Linkage(matrice [][]float64, noms []string, taille int) (result string) {
-
-	var i_min int
-	var j_min int
-	var min_val float64
-
-	var old_index []int
-	var dist []float64
-	old_index = make([]int, taille)
-	dist = make([]float64, taille)
-
-	for i, _ := range old_index {
-		old_index[i] = i
-		dist[i] = 0
-	}
-	lenindex := len(old_index)
-	for i := 1; i < lenindex; i++ {
-		fmt.Printf("1: iteration %v %v\n", i, lenindex)
-		//for i := len(old_index) - 1; i > 0; i-- {
-		if i != 0 {
-			fmt.Printf("iteration %v %v %v\n", old_index, i, matrice)
-			i_min, j_min, min_val, dist[i] = minMatrix(matrice, old_index[i])
-			min_col, max_col := minMaxMatrix(i_min, j_min)
-			columnsMerge(matrice, old_index, min_col, max_col)
-			writeName(noms, dist, min_col, max_col, min_val)
-			//-------------------------------------------------------
-			if i == 0 {
-				result = result + noms[min_col]
-			} else {
-				result = result + "," + noms[min_col]
-			}
-			//-------------------------------------------------------
-		}
-	}
-
-	/* au debut on a fait :
-	chaine = noms[0] + ";"
-	et cette commande recupere uniquementle premier arbre
-	alors que il fallait faire une concatenation qu'on vient d'ajouter
-	afin d'ecrire tous les arbres avant le terminateur point virgule */
-
-	//chaine = noms[0] + ";"
-	result = result + ";"
+func MatrixLinkage(matrix [][]float64, colname []string) (result string) {
 
 	return
 }

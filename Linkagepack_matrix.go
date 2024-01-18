@@ -7,6 +7,8 @@ import (
 	"sort"
 )
 
+const minLength = 9999.9
+
 type TreeNode struct {
 	Rank1   int
 	Length1 float64
@@ -77,8 +79,8 @@ func columnMerge(matrix [][]float64, min_col, max_col int) [][]float64 {
 
 // return col A, col B, minDist, minDist-minDist1
 func minMatrix(matrix [][]float64, size int) (int, int, float64, float64) {
-	min := 1000.0  //math.MaxFloat64  //matrix[0][1]
-	min1 := 1000.0 //math.MaxFloat64 //matrix[0][2]
+	min := minLength  //math.MaxFloat64  //matrix[0][1]
+	min1 := minLength //math.MaxFloat64 //matrix[0][2]
 	i_min := 0
 	j_min := 1
 
